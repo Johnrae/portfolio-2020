@@ -1,8 +1,36 @@
 import React, { useRef, useEffect, useState, Suspense } from 'react'
 import { Canvas, useLoader } from 'react-three-fiber'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
-import { OrbitControls, Stars } from 'drei'
-import { isBrowser } from 'gatsby'
+import {
+  OrbitControls,
+  Stars,
+  Dodecahedron,
+  Text,
+  MeshWobbleMaterial,
+} from 'drei'
+
+const Loader = () => {
+  return (
+    <>
+      <Text
+        color="white" // default
+        anchorX="center" // default
+        anchorY="middle" // default
+      >
+        hello world!
+      </Text>
+
+      <Dodecahedron>
+        <MeshWobbleMaterial
+          attach="material"
+          color={'white'}
+          factor={1} // Strength, 0 disables the effect (default=1)
+          speed={4} // Speed (default=1)
+        />
+      </Dodecahedron>
+    </>
+  )
+}
 
 const Frog = () => {
   const [model, set] = useState()
@@ -10,8 +38,7 @@ const Frog = () => {
     new GLTFLoader().load('/scene.gltf', set)
   }, [])
 
-  if (!model) return null
-  console.log(model)
+  if (!model) return <Loader />
 
   return (
     <primitive
@@ -53,10 +80,12 @@ const Header = () => {
           style={{ height: '100vh', width: '100vw' }}
           camera={{ position: [0, 0, 5] }}
         >
-          <ambientLight intensity={0.5} />
-          <Suspense fallback={<Stars />}>
+          <ambientLight intensity={0.2} />
+          <spotLight position={[-10, 10, 20]} />
+          <Suspense fallback={null}>
             <Frog />
           </Suspense>
+          <Stars />
           <OrbitControls
             autoRotate
             autoRotateSpeed={5}
