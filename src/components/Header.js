@@ -88,7 +88,6 @@ const Header = () => {
           <Stars />
           <OrbitControls
             autoRotate
-            autoRotateSpeed={5}
             minPolarAngle={Math.PI / 3}
             maxPolarAngle={Math.PI / 2}
           />
