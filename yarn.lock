@@ -10745,10 +10745,10 @@ react-merge-refs@^1.0.0, react-merge-refs@^1.1.0:
   resolved "https://registry.yarnpkg.com/react-merge-refs/-/react-merge-refs-1.1.0.tgz#73d88b892c6c68cbb7a66e0800faa374f4c38b06"
   integrity sha512-alTKsjEL0dKH/ru1Iyn7vliS2QRcBp9zZPGoWxUOvRGWPUYgjo+V01is7p04It6KhgrzhJGnIj9GgX8W4bZoCQ==
 
-react-postprocessing@^1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/react-postprocessing/-/react-postprocessing-1.1.2.tgz#91b55db513d7230cdce48c29b5456cc167cc624f"
-  integrity sha512-cx26ZDA5fST+2UEWpmJ+/pePQSyB4E8wrz6kFCLP9GDWBdgl9IseyY9z3blVtg7Wa6TuLCNzfrSs8N0BbEyppA==
+react-postprocessing@^1.1.4:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/react-postprocessing/-/react-postprocessing-1.1.4.tgz#a8ce7f43f58be4570c1ec52397a5462aad1c0397"
+  integrity sha512-LQd5i3FPDahho6fIH3m3TPDsQ43+owynmTEt9QWorRoIlRw35cV87VLrKKyEUS5hispeOzhxW2WshJs6ttE7IQ==
   dependencies:
     react-merge-refs "^1.1.0"
 

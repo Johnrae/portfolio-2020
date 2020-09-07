@@ -1,96 +1,125 @@
-import React, { useRef, useEffect, useState, Suspense } from 'react'
-import { Canvas, useLoader } from 'react-three-fiber'
+import React, { useEffect, useState, Suspense, useRef } from 'react'
+import { Canvas, useFrame } from 'react-three-fiber'
+import * as THREE from 'three'
+import {
+  EffectComposer,
+  DepthOfField,
+  Bloom,
+  Noise,
+  Vignette,
+  SSAO,
+} from 'react-postprocessing'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import {
   OrbitControls,
   Stars,
-  Dodecahedron,
+  Sphere,
   Text,
-  MeshWobbleMaterial,
+  MeshDistortMaterial,
+  Icosahedron,
+  Plane,
 } from 'drei'
+import { RenderPass, BlendFunction } from 'postprocessing'
 
-const Loader = () => {
+const Loader = ({ position = [0, 0, 0], animated = false }) => {
+  const mesh = useRef()
+  const mat = useRef()
+
+  useFrame(() => {
+    if (animated) {
+      mesh.current.rotation.x = mesh.current.rotation.y += random(0, 0.01)
+    }
+  })
+
   return (
-    <>
-      <Text
-        color="white" // default
-        anchorX="center" // default
-        anchorY="middle" // default
-      >
-        hello world!
-      </Text>
-
-      <Dodecahedron>
-        <MeshWobbleMaterial
-          attach="material"
-          color={'white'}
-          factor={1} // Strength, 0 disables the effect (default=1)
-          speed={4} // Speed (default=1)
-        />
-      </Dodecahedron>
-    </>
+    <Sphere castShadow ref={mesh} args={[1, 100, 100]} position={position}>
+      <MeshDistortMaterial
+        ref={mat}
+        computeVertexNormals
+        castShadow
+        attach="material"
+        color={'hotpink'}
+        distort={0.7} // Strength, 0 disables the effect (default=1)
+        speed={4} // Speed (default=1)
+      />
+      {/* <meshLambertMaterial castShadow color="hotpink" attach="material" /> */}
+    </Sphere>
   )
 }
 
-const Frog = () => {
+function random(min = 0, max = 1) {
+  return Math.random() * (max - min) + min
+}
+
+function randomPosition(min = -20, max = 20) {
+  return [random(min, max), random(min, max), random(min, max)]
+}
+
+const Orbiters = () => {
+  const group = useRef()
+
+  useFrame(({ clock: { elapsedTime: clock } }) => {
+    group.current.rotation.x = group.current.rotation.y += 0.01
+  })
+
+  return (
+    <group ref={group}>
+      <Loader animated position={randomPosition()} />
+      <Loader animated position={randomPosition()} />
+      <Loader animated position={randomPosition()} />
+      <Loader animated position={randomPosition()} />
+      <Loader animated position={randomPosition()} />
+      <Loader animated position={randomPosition()} />
+      <Loader animated position={randomPosition()} />
+      <Loader animated position={randomPosition()} />
+      <Loader animated position={randomPosition()} />
+      <Loader animated position={randomPosition()} />
+    </group>
+  )
+}
+
+const Mercury = () => {
   const [model, set] = useState()
   useEffect(() => {
     new GLTFLoader().load('/scene.gltf', set)
   }, [])
 
-  if (!model) return <Loader />
-
-  return (
-    <primitive
-      object={model.scene}
-      position={[0, 0, 0]}
-      rotation={[0, 0.8, 0.2]}
-      scale={[0.2, 0.2, 0.2]}
-    />
-  )
+  return <Loader />
 }
 
 const Header = () => {
   const isBrowser = typeof window !== 'undefined'
+
   return (
-    <div style={{ background: 'black' }}>
-      <h1
-        style={{
-          color: 'white',
-          position: 'absolute',
-          width: '100%',
-          textAlign: 'center',
-        }}
-      >
-        Hello
-      </h1>
-      <h1
-        style={{
-          color: 'white',
-          position: 'absolute',
-          width: '100%',
-          textAlign: 'center',
-          bottom: 0,
-        }}
-      >
-        Freaks
-      </h1>
+    <div style={{ backgroundColor: 'lavender' }}>
       {isBrowser && (
         <Canvas
           style={{ height: '100vh', width: '100vw' }}
-          camera={{ position: [0, 0, 5] }}
+          camera={{ position: [0, 0, 3] }}
         >
-          <ambientLight intensity={0.2} />
-          <spotLight position={[-10, 10, 20]} />
+          <ambientLight intensity={0.6} />
+          <pointLight position={[-10, 10, 20]} penumbra={1} intensity={0.9} />
+          <pointLight position={[10, -10, -10]} intensity={0.9} />
           <Suspense fallback={null}>
-            <Frog />
+            <Loader />
+            <Mercury />
+            <Plane
+              args={[200, 200]}
+              position={[0, 0, -30]}
+              rotation={[0, 0, 0.5]}
+            >
+              <meshBasicMaterial attach="material" color="lavender" />
+            </Plane>
+
+            <EffectComposer>
+              <DepthOfField
+                focusDistance={0.0}
+                focalLength={0.05}
+                bokehScale={3}
+                blendFunction={BlendFunction.NORMAL}
+              />
+            </EffectComposer>
           </Suspense>
-          <Stars />
-          <OrbitControls
-            autoRotate
-            minPolarAngle={Math.PI / 3}
-            maxPolarAngle={Math.PI / 2}
-          />
         </Canvas>
       )}
     </div>
