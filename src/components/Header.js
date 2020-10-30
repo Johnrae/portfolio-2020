@@ -1,7 +1,7 @@
 import React, { useEffect, useState, Suspense, useRef, useMemo } from 'react'
 import { Canvas, useFrame, useThree } from 'react-three-fiber'
 import * as THREE from 'three'
-import { EffectComposer, DepthOfField } from 'react-postprocessing'
+import { EffectComposer, DepthOfField, SSAO, Bloom } from 'react-postprocessing'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import {
   OrbitControls,
@@ -18,7 +18,7 @@ import niceColors from 'nice-color-palettes'
 
 function Mouse() {
   const { viewport } = useThree()
-  const [, api] = useSphere(() => ({ type: 'Kinematic', args: 3 }))
+  const [, api] = useSphere(() => ({ type: 'Kinematic', args: 6 }))
   return useFrame((state) =>
     api.position.set(
       -(state.mouse.x * viewport.width) / 2,
@@ -53,7 +53,7 @@ function Borders() {
 function Plane({ color, ...props }) {
   const [ref] = usePlane(() => ({ ...props }))
   return (
-    <mesh ref={ref} receiveShadow>
+    <mesh ref={ref}>
       <planeBufferGeometry attach="geometry" args={[1000, 1000]} />
       <meshPhongMaterial attach="material" color={color} />
     </mesh>
@@ -62,10 +62,11 @@ function Plane({ color, ...props }) {
 
 function InstancedSpheres({ number = 100 }) {
   const [ref] = useSphere((index) => ({
-    mass: 1,
+    mass: 100,
     position: [Math.random() - 0.5, index * 2, Math.random() - 0.5],
     args: 1,
   }))
+
   const colors = useMemo(() => {
     const array = new Float32Array(number * 3)
     const color = new THREE.Color()
@@ -76,6 +77,7 @@ function InstancedSpheres({ number = 100 }) {
         .toArray(array, i * 3)
     return array
   }, [number])
+
   return (
     <instancedMesh
       ref={ref}
@@ -83,7 +85,7 @@ function InstancedSpheres({ number = 100 }) {
       receiveShadow
       args={[null, null, number]}
     >
-      <sphereBufferGeometry attach="geometry" args={[0.2, 16, 16]}>
+      <sphereBufferGeometry attach="geometry" args={[1, 16, 16]}>
         <instancedBufferAttribute
           attachObject={['attributes', 'color']}
           args={[colors, 3]}
@@ -130,13 +132,14 @@ function randomPosition(min = -20, max = 20) {
 
 const Header = () => {
   const isBrowser = typeof window !== 'undefined'
+  const AO = { samples: 3, luminanceInfluence: 0.6, radius: 2, intensity: 5 }
 
   return (
     <div style={{ backgroundColor: 'lavender' }}>
       {isBrowser && (
         <Canvas
           style={{ height: '100vh', width: '100vw' }}
-          camera={{ position: [0, 2, -5] }}
+          camera={{ position: [0, 0, -10], fov: 50, near: 5, far: 50 }}
           concurrent
           shadowMap
           sRGB
@@ -150,16 +153,25 @@ const Header = () => {
               <Mouse />
               <Borders />
               {/* <Loader /> */}
-              <InstancedSpheres number={200}></InstancedSpheres>
+              <InstancedSpheres />
 
-              {/* <EffectComposer>
-                <DepthOfField
-                  focusDistance={0.0}
-                  focalLength={0.5}
-                  bokehScale={3}
-                  blendFunction={BlendFunction.NORMAL}
+              <EffectComposer>
+                <SSAO
+                  {...AO}
+                  samples={21}
+                  radius={7}
+                  intensity={20}
+                  luminanceInfluence={0.6}
+                  color="black"
                 />
-              </EffectComposer> */}
+                <SSAO {...AO} />
+                <Bloom
+                  luminanceThreshold={0.85}
+                  luminanceSmoothing={0}
+                  height={300}
+                  opacity={3}
+                />
+              </EffectComposer>
             </Suspense>
           </Physics>
         </Canvas>
