@@ -136,6 +136,10 @@ const Header = () => {
 
   return (
     <div style={{ backgroundColor: 'lavender' }}>
+      <div className="container">
+        <h1>John Rae</h1>
+        <h2>Software Goblin</h2>
+      </div>
       {isBrowser && (
         <Canvas
           style={{ height: '100vh', width: '100vw' }}
