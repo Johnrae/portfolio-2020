@@ -18,7 +18,8 @@ import niceColors from 'nice-color-palettes'
 
 function Mouse() {
   const { viewport } = useThree()
-  const [, api] = useSphere(() => ({ type: 'Kinematic', args: 6 }))
+  let ballSize = viewport.width < 768 ? 6 : 4
+  const [, api] = useSphere(() => ({ type: 'Kinematic', args: ballSize }))
   return useFrame((state) =>
     api.position.set(
       -(state.mouse.x * viewport.width) / 2,
@@ -61,10 +62,20 @@ function Plane({ color, ...props }) {
 }
 
 function InstancedSpheres({ number = 100 }) {
+  const isMobile = window.innerWidth < 768
+  let ballSize = 1
+
+  if (isMobile) {
+    number = 50
+    ballSize = 0.66
+  }
+
+  console.log(ballSize, window.innerWidth)
+
   const [ref] = useSphere((index) => ({
     mass: 100,
     position: [Math.random() - 0.5, index * 2, Math.random() - 0.5],
-    args: 1,
+    args: ballSize,
   }))
 
   const colors = useMemo(() => {
@@ -85,7 +96,7 @@ function InstancedSpheres({ number = 100 }) {
       receiveShadow
       args={[null, null, number]}
     >
-      <sphereBufferGeometry attach="geometry" args={[1, 16, 16]}>
+      <sphereBufferGeometry attach="geometry" args={[ballSize, 16, 16]}>
         <instancedBufferAttribute
           attachObject={['attributes', 'color']}
           args={[colors, 3]}
