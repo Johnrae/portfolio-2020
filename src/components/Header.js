@@ -145,6 +145,10 @@ const Header = () => {
   const isBrowser = typeof window !== 'undefined'
   const { viewport } = useThree()
   const AO = { samples: 3, luminanceInfluence: 0.6, radius: 2, intensity: 5 }
+  const gl = {
+    alpha: false,
+    antialias: isBrowser && window.innerWidth > 768,
+  }
 
   return (
     <div style={{ backgroundColor: 'lavender' }}>
@@ -158,7 +162,7 @@ const Header = () => {
           camera={{ position: [0, 0, -10], fov: 50, near: 5, far: 50 }}
           shadowMap
           sRGB
-          gl={{ alpha: false }}
+          gl={gl}
         >
           <ambientLight intensity={0.6} />
           <pointLight position={[-10, 10, 20]} penumbra={1} intensity={0.9} />
