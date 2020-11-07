@@ -143,6 +143,7 @@ function randomPosition(min = -20, max = 20) {
 
 const Header = () => {
   const isBrowser = typeof window !== 'undefined'
+  const { viewport } = useThree()
   const AO = { samples: 3, luminanceInfluence: 0.6, radius: 2, intensity: 5 }
 
   return (
@@ -170,23 +171,25 @@ const Header = () => {
               {/* <Loader /> */}
               <InstancedSpheres />
 
-              <EffectComposer>
-                <SSAO
-                  {...AO}
-                  samples={21}
-                  radius={7}
-                  intensity={20}
-                  luminanceInfluence={0.6}
-                  color="black"
-                />
-                <SSAO {...AO} />
-                <Bloom
-                  luminanceThreshold={0.85}
-                  luminanceSmoothing={0}
-                  height={300}
-                  opacity={3}
-                />
-              </EffectComposer>
+              {window.innerWidth > 768 && (
+                <EffectComposer>
+                  <SSAO
+                    {...AO}
+                    samples={21}
+                    radius={7}
+                    intensity={20}
+                    luminanceInfluence={0.6}
+                    color="black"
+                  />
+                  <SSAO {...AO} />
+                  <Bloom
+                    luminanceThreshold={0.85}
+                    luminanceSmoothing={0}
+                    height={300}
+                    opacity={3}
+                  />
+                </EffectComposer>
+              )}
             </Suspense>
           </Physics>
         </Canvas>
