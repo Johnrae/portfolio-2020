@@ -156,7 +156,6 @@ const Header = () => {
         <Canvas
           style={{ height: '100vh', width: '100vw' }}
           camera={{ position: [0, 0, -10], fov: 50, near: 5, far: 50 }}
-          concurrent
           shadowMap
           sRGB
           gl={{ alpha: false }}
